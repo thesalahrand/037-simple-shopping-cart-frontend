@@ -36,6 +36,7 @@ router.beforeEach((to, from, next) => {
   authStore.init()
 
   if (to.name !== 'login' && authStore.user === null) next({ name: 'login' })
+  else if (to.name === 'login' && authStore.user !== null) next({ name: 'home' })
   else next()
 })
 

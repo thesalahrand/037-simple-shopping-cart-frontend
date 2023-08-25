@@ -1,22 +1,38 @@
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
+import router from '@/router'
 import { defineStore } from 'pinia'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
+  const errors = reactive({
+    login: ''
+  })
 
   function init() {
     user.value = JSON.parse(localStorage.getItem('user')) || null
   }
 
-  function login() {
-    const _user = {
-      id: 1,
-      username: 'thesalahrand',
-      created_at: '2023-08-25 00:00:01',
-      updated_at: '2023-08-25 00:00:01'
+  async function login(username) {
+    try {
+      const res = await fetch('/api/login.php', {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json',
+          Accept: 'application/json'
+        },
+        body: JSON.stringify({ username })
+      })
+      const resData = await res.json()
+      if (!res.ok) throw new Error(resData.message)
+
+      user.value = resData
+      localStorage.setItem('user', JSON.stringify(resData))
+      errors.login = ''
+      router.push({ name: 'home' })
+    } catch (err) {
+      console.log(err)
+      errors.login = err
     }
-    user.value = _user
-    localStorage.setItem('user', JSON.stringify(_user))
   }
 
   function logout() {
@@ -24,5 +40,5 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('user')
   }
 
-  return { user, init, login, logout }
+  return { user, errors, init, login, logout }
 })
