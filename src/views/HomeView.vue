@@ -2,6 +2,7 @@
 import { useProductStore } from '@/stores/product'
 import IconCart from '@/components/icons/IconCart.vue'
 import IconHeart from '@/components/icons/IconHeart.vue'
+import IconHeartSolid from '@/components/icons/IconHeartSolid.vue'
 
 const productStore = useProductStore()
 productStore.init()
@@ -23,8 +24,12 @@ productStore.readAll()
             :src="product.image"
             alt="product image"
           />
-          <div class="p-2 top-2 right-2 absolute rounded-md z-10 bg-white cursor-pointer">
-            <IconHeart classes="w-6 h-6 text-pink-500" />
+          <div
+            class="p-2 top-2 right-2 absolute rounded-md z-10 bg-white cursor-pointer"
+            @click="productStore.toggleFromWishlist(product.id)"
+          >
+            <IconHeart v-show="!product.added_to_cart" classes="w-6 h-6 text-pink-500" />
+            <IconHeartSolid v-show="product.added_to_cart" classes="w-6 h-6 text-pink-500" />
           </div>
         </div>
         <div class="p-4">
