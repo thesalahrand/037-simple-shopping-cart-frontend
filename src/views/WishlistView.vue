@@ -10,7 +10,7 @@ wishlistStore.readAllProducts()
 
 <template>
   <div class="max-w-screen-xl mx-auto px-4 py-6">
-    <h6 class="font-bold dark:text-white mb-6 text-xl text-center">Wishlist Products</h6>
+    <h6 class="font-bold dark:text-white mb-6 text-xl text-center">My Wishlist</h6>
     <div class="grid grid-cols-4 gap-4">
       <div
         v-for="(product, idx) in wishlistStore.products"
