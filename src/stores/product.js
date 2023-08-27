@@ -42,22 +42,11 @@ export const useProductStore = defineStore('product', () => {
       const resData = await res.json()
       if (!res.ok) throw new Error(resData.message)
 
-      switch (resData.toggleType) {
-        case 'add':
-          products.value = products.value.map((product) => {
-            return product.id == resData.singleWishlistItem.product_id
-              ? { ...product, added_to_cart: 1 }
-              : product
-          })
-          break
-        case 'remove':
-          products.value = products.value.map((product) => {
-            return product.id == resData.singleWishlistItem.product_id
-              ? { ...product, added_to_cart: 0 }
-              : product
-          })
-          break
-      }
+      products.value = products.value.map((product) => {
+        return product.id == resData.singleWishlistItem.product_id
+          ? { ...product, added_to_cart: resData.toggleType == 'add' ? 1 : 0 }
+          : product
+      })
     } catch (err) {
       console.log(err)
     }
