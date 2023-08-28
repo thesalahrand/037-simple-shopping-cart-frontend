@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRoute } from 'vue-router'
 import router from '@/router'
 import { useAuthStore } from '@/stores/auth'
 import { initCollapses } from 'flowbite'
@@ -10,6 +10,7 @@ onMounted(() => {
 })
 
 const authStore = useAuthStore()
+const route = useRoute()
 
 function logoutHandler() {
   authStore.logout()
@@ -54,7 +55,12 @@ function logoutHandler() {
           <li v-show="authStore.user">
             <RouterLink
               :to="{ name: 'home' }"
-              class="text-sm block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+              class="block py-2 pl-3 pr-4 rounded md:p-0 dark:text-white text-sm"
+              :class="
+                route.name === 'home'
+                  ? 'text-white bg-blue-700 md:bg-transparent md:text-blue-700 md:dark:text-blue-500'
+                  : 'text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent'
+              "
               aria-current="page"
               >Products</RouterLink
             >
@@ -62,21 +68,36 @@ function logoutHandler() {
           <li v-show="authStore.user">
             <RouterLink
               :to="{ name: 'wishlist' }"
-              class="text-sm block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+              class="block py-2 pl-3 pr-4 rounded md:p-0 dark:text-white text-sm"
+              :class="
+                route.name === 'wishlist'
+                  ? 'text-white bg-blue-700 md:bg-transparent md:text-blue-700 md:dark:text-blue-500'
+                  : 'text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent'
+              "
               >Wishlist</RouterLink
             >
           </li>
           <li v-show="authStore.user">
             <RouterLink
               :to="{ name: 'cart' }"
-              class="text-sm block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+              class="block py-2 pl-3 pr-4 rounded md:p-0 dark:text-white text-sm"
+              :class="
+                route.name === 'cart'
+                  ? 'text-white bg-blue-700 md:bg-transparent md:text-blue-700 md:dark:text-blue-500'
+                  : 'text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent'
+              "
               >Cart</RouterLink
             >
           </li>
           <li v-show="!authStore.user">
             <RouterLink
               :to="{ name: 'login' }"
-              class="text-sm block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+              class="block py-2 pl-3 pr-4 rounded md:p-0 dark:text-white text-sm"
+              :class="
+                route.name === 'login'
+                  ? 'text-white bg-blue-700 md:bg-transparent md:text-blue-700 md:dark:text-blue-500'
+                  : 'text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent'
+              "
               >Login</RouterLink
             >
           </li>
