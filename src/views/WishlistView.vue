@@ -1,13 +1,14 @@
 <script setup>
 import { useWishlistStore } from '@/stores/wishlist'
-// import { useCartStore } from '@/stores/cart'
+import { useCartStore } from '@/stores/cart'
 import IconCart from '@/components/icons/IconCart.vue'
 import IconXMark from '@/components/icons/IconXMark.vue'
 
 const wishlistStore = useWishlistStore()
-// const cartStore = useCartStore()
+const cartStore = useCartStore()
+
 wishlistStore.init()
-// cartStore.init()
+cartStore.init()
 </script>
 
 <template>
@@ -43,6 +44,7 @@ wishlistStore.init()
               >${{ item.product_price }}</span
             >
             <button
+              @click="cartStore.manageItem(item.product_id, 'increase')"
               class="flex items-center gap-2 text-white text-sm bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
               <IconCart classes="w-6 h-6" />

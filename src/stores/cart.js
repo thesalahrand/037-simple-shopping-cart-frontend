@@ -1,21 +1,21 @@
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 import { defineStore } from 'pinia'
 import { useAuthStore } from '@/stores/auth'
 
 export const useCartStore = defineStore('cart', () => {
   const authUser = ref(null)
-  const products = ref(null)
+  const items = reactive([])
 
   function init() {
     const authStore = useAuthStore()
     authStore.init()
     authUser.value = authStore.user
-    readAllProducts()
+    readItems()
   }
 
-  async function readAllProducts() {
+  async function readItems() {
     try {
-      const res = await fetch('/api/read-all-cart-products.php', {
+      const res = await fetch('/api/read-cart-items.php', {
         headers: {
           Authorization: authUser.value.jwt,
           Accept: 'application/json'
@@ -24,7 +24,8 @@ export const useCartStore = defineStore('cart', () => {
       const resData = await res.json()
       if (!res.ok) throw new Error(resData.message)
 
-      products.value = resData
+      items.splice(0, items.length)
+      items.push(...resData)
     } catch (err) {
       console.log(err)
     }
@@ -72,10 +73,9 @@ export const useCartStore = defineStore('cart', () => {
   //   }
   // }
 
-  async function updateSingleProduct(productId, type) {
-    console.log({ productId, type })
+  async function manageItem(productId, type) {
     try {
-      const res = await fetch('/api/update-single-cart-product.php', {
+      const res = await fetch('/api/manage-cart-item.php', {
         method: 'POST',
         headers: {
           Authorization: authUser.value.jwt,
@@ -84,29 +84,32 @@ export const useCartStore = defineStore('cart', () => {
         body: JSON.stringify({ productId, type })
       })
       const resData = await res.json()
+      console.log(resData)
       if (!res.ok) throw new Error(resData.message)
 
       switch (resData.actualOperationType) {
         case 'created':
-          products.value.unshift(resData.singleCartItem)
+          items.unshift(resData.singleCartItem)
           break
-        case 'updated':
-          products.value = products.value.map((product) => {
-            return product.product_id == resData.singleCartItem.product_id
-              ? resData.singleCartItem
-              : product
-          })
-          break
-        case 'deleted':
-          products.value = products.value.filter(
-            (product) => product.product_id == resData.singleCartItem.product_id
+        case 'updated': {
+          const updatedItem = items.find(
+            (item) => item.cart_item_id == resData.singleCartItem.cart_item_id
           )
+          updatedItem.quantity = resData.singleCartItem.product_quantity
           break
+        }
+        case 'deleted': {
+          const deletedItemIdx = items.findIndex(
+            (item) => item.cart_item_id == resData.singleCartItem.cart_item_id
+          )
+          items.splice(deletedItemIdx, 1)
+          break
+        }
       }
     } catch (err) {
       console.log(err)
     }
   }
 
-  return { init, products, readAllProducts, updateSingleProduct }
+  return { init, items, manageItem }
 })
