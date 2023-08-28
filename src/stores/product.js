@@ -1,20 +1,21 @@
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 import { defineStore } from 'pinia'
 import { useAuthStore } from '@/stores/auth'
 
 export const useProductStore = defineStore('product', () => {
   const authUser = ref(null)
-  const products = ref(null)
+  const items = reactive([])
 
   function init() {
     const authStore = useAuthStore()
     authStore.init()
     authUser.value = authStore.user
+    readItems()
   }
 
-  async function readAll() {
+  async function readItems() {
     try {
-      const res = await fetch('/api/read-all-products.php', {
+      const res = await fetch('/api/read-products.php', {
         headers: {
           Authorization: authUser.value.jwt,
           Accept: 'application/json'
@@ -23,34 +24,12 @@ export const useProductStore = defineStore('product', () => {
       const resData = await res.json()
       if (!res.ok) throw new Error(resData.message)
 
-      products.value = resData
+      items.splice(0, items.length)
+      items.push(...resData)
     } catch (err) {
       console.log(err)
     }
   }
 
-  async function toggleFromWishlist(productId) {
-    try {
-      const res = await fetch('/api/toggle-from-wishlist.php', {
-        method: 'POST',
-        headers: {
-          Authorization: authUser.value.jwt,
-          Accept: 'application/json'
-        },
-        body: JSON.stringify({ productId })
-      })
-      const resData = await res.json()
-      if (!res.ok) throw new Error(resData.message)
-
-      products.value = products.value.map((product) => {
-        return product.id == resData.singleWishlistItem.product_id
-          ? { ...product, added_to_cart: resData.toggleType == 'add' ? 1 : 0 }
-          : product
-      })
-    } catch (err) {
-      console.log(err)
-    }
-  }
-
-  return { init, products, readAll, toggleFromWishlist }
+  return { items, init }
 })

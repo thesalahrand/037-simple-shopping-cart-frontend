@@ -1,20 +1,21 @@
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 import { defineStore } from 'pinia'
 import { useAuthStore } from '@/stores/auth'
 
 export const useWishlistStore = defineStore('wishlist', () => {
   const authUser = ref(null)
-  const products = ref(null)
+  const items = reactive([])
 
   function init() {
     const authStore = useAuthStore()
     authStore.init()
     authUser.value = authStore.user
+    readItems()
   }
 
-  async function readAllProducts() {
+  async function readItems() {
     try {
-      const res = await fetch('/api/read-all-wishlist-products.php', {
+      const res = await fetch('/api/read-wishlist-items.php', {
         headers: {
           Authorization: authUser.value.jwt,
           Accept: 'application/json'
@@ -23,15 +24,16 @@ export const useWishlistStore = defineStore('wishlist', () => {
       const resData = await res.json()
       if (!res.ok) throw new Error(resData.message)
 
-      products.value = resData
+      items.splice(0, items.length)
+      items.push(...resData)
     } catch (err) {
       console.log(err)
     }
   }
 
-  async function removeProduct(productId) {
+  async function addItem(productId) {
     try {
-      const res = await fetch('/api/toggle-from-wishlist.php', {
+      const res = await fetch('/api/create-wishlist-item.php', {
         method: 'POST',
         headers: {
           Authorization: authUser.value.jwt,
@@ -42,13 +44,33 @@ export const useWishlistStore = defineStore('wishlist', () => {
       const resData = await res.json()
       if (!res.ok) throw new Error(resData.message)
 
-      products.value = products.value.filter((product) => {
-        return product.id != resData.singleWishlistItem.product_id
-      })
+      items.unshift(resData)
     } catch (err) {
       console.log(err)
     }
   }
 
-  return { init, products, readAllProducts, removeProduct }
+  async function deleteItem(productId) {
+    try {
+      const res = await fetch('/api/delete-wishlist-item.php', {
+        method: 'POST',
+        headers: {
+          Authorization: authUser.value.jwt,
+          Accept: 'application/json'
+        },
+        body: JSON.stringify({ productId })
+      })
+      const resData = await res.json()
+      if (!res.ok) throw new Error(resData.message)
+
+      const deleteItemIdx = items.findIndex(
+        (item) => item.wishlist_item_id == resData.wishlist_item_id
+      )
+      items.splice(deleteItemIdx, 1)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  return { items, init, addItem, deleteItem }
 })
